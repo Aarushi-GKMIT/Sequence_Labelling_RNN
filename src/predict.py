@@ -49,7 +49,7 @@ def predict(tokens):
 
 if __name__ == "__main__":
    
-    tokens = input("Enter the token sequence")
+    tokens = input("Enter the token sequence").split()
     labels = predict(tokens)
 
     for t, l in zip(tokens, labels):
