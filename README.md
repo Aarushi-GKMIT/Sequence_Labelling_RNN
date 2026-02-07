@@ -1,0 +1,1 @@
+#### Trained RNN for sequence labelling task for predicting BIO (Beginnning, Inside and Outside) Tags given the tokens of a sequence.
