@@ -1,29 +1,39 @@
 import torch
-from sklearn.metrics import precision_recall_fscore_support
+from seqeval.metrics import precision_score, recall_score, f1_score
+
 
 def evaluate(model, dataloader, label2id):
     model.eval()
-    y_true, y_pred = [], []
 
-    ignore_label = label2id["O"]
+    id2label = {v: k for k, v in label2id.items()}
+
+    all_preds = []
+    all_labels = []
 
     with torch.no_grad():
         for tokens, labels in dataloader:
             logits = model(tokens)
-            preds = logits.argmax(-1)
+            preds = logits.argmax(dim=-1)
 
-            for t_seq, p_seq in zip(labels, preds):
-                for t, p in zip(t_seq, p_seq):
-                    if t.item() == ignore_label:
+            for pred_seq, label_seq in zip(preds, labels):
+                pred_tags = []
+                true_tags = []
+
+                for p, l in zip(pred_seq, label_seq):
+                    if l.item() == 0:  
                         continue
-                    y_true.append(t.item())
-                    y_pred.append(p.item())
 
-    p, r, f1, _ = precision_recall_fscore_support(
-        y_true,
-        y_pred,
-        average="micro",
-        zero_division=0
-    )
-    return p, r, f1
+                    pred_tags.append(id2label[p.item()])
+                    true_tags.append(id2label[l.item()])
+
+                all_preds.append(pred_tags)
+                all_labels.append(true_tags)
+
+    precision = precision_score(all_labels, all_preds)
+    recall = recall_score(all_labels, all_preds)
+    f1 = f1_score(all_labels, all_preds)
+
+    return precision, recall, f1
+
+
 

@@ -27,6 +27,8 @@ def predict(tokens):
         token2id["<PAD>"]
     )
 
+    print(token_ids)
+
     x = torch.tensor([token_ids])
 
     model = RNNTagger(
@@ -48,8 +50,9 @@ def predict(tokens):
 
 
 if __name__ == "__main__":
-   
+
     tokens = input("Enter the token sequence").split()
+
     labels = predict(tokens)
 
     for t, l in zip(tokens, labels):
